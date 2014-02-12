@@ -2,7 +2,6 @@
 
 # TO DO
 '''
-login and get links
 invalid login
 download images
 segregate into folders
@@ -12,28 +11,30 @@ imgur gallery support
 
 # Import modules
 from http import cookiejar
-from http import client
 import urllib
+import getpass
 
+# Load credentials from file
+def get_userpass():
+	file = open("rsc.cfg", "r")
+	creds = file.readlines()
+	for i,j in enumerate(creds):
+		    creds[i] = j.rstrip()
+	return creds
 
 # Config variables
-#
-#
-
-
-def save_cookie():
-	# Save cookies to a file for future use
-	pass
+creds = get_userpass()
+username = creds[0]
+password = creds[1]
 
 def load_cookie():
 	cj = cookiejar.CookieJar()
 	return cj
 
 def login():
-# Currently you need to pass a username and password, cookies loaded from browser are in the works
 	cj = load_cookie()
 	opener = urllib.request.build_opener(urllib.request.HTTPCookieProcessor(cj),urllib.request.HTTPSHandler)
-	params = urllib.parse.urlencode({'user': 'burukuru', 'passwd': 'password'}) # Replace with prompt
+	params = urllib.parse.urlencode({'user': username, 'passwd': password})
 	params_bin = params.encode('ascii')
 	data = opener.open("https://ssl.reddit.com/post/login", params_bin)
 	return cj
@@ -41,7 +42,8 @@ def login():
 def get_saved_links():
 	cj = login()
 	opener = urllib.request.build_opener(urllib.request.HTTPCookieProcessor(cj),urllib.request.HTTPSHandler)
-	data2 = opener.open("https://ssl.reddit.com/user/burukuru/saved/")
+	url = "https://ssl.reddit.com/user/" + username + "/saved/"
+	data2 = opener.open(url)
 	print(data2.read())
 	pass
 

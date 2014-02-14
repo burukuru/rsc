@@ -31,17 +31,21 @@ def load_cookie():
 	cj = cookiejar.CookieJar()
 	return cj
 
+def default_opener(cj):
+	opener = urllib.request.build_opener(urllib.request.HTTPCookieProcessor(cj),urllib.request.HTTPSHandler)
+	return opener
+
 def login():
 	cj = load_cookie()
-	opener = urllib.request.build_opener(urllib.request.HTTPCookieProcessor(cj),urllib.request.HTTPSHandler)
+	opener = default_opener(cj)
 	params = urllib.parse.urlencode({'user': username, 'passwd': password})
 	params_bin = params.encode('ascii')
 	data = opener.open("https://ssl.reddit.com/post/login", params_bin)
 	return cj
 
 def get_saved_links():
-	cj = login()
-	opener = urllib.request.build_opener(urllib.request.HTTPCookieProcessor(cj),urllib.request.HTTPSHandler)
+	reddit_cookie = login()
+	opener = default_opener(reddit_cookie)
 	url = "https://ssl.reddit.com/user/" + username + "/saved/"
 	data2 = opener.open(url)
 	print(data2.read())

@@ -55,11 +55,9 @@ def get_saved_links():
 
 # Receive div section for an item in etree form and extract info
 def extract_info_from_div(saved_item_div):
-	subs = saved_item_div.xpath("//a") #[contains(@class, 'subreddit')]")
-	print(html.tostring(saved_item_div))
-	print(subs)
+	subs = saved_item_div.xpath(".//a[contains(@class, 'subreddit')]")
 	for sub in subs:
-		print(html.tostring(sub))
+		print(sub.text)
 
 def make_download_list():
 	#saved = get_saved_links()
@@ -67,9 +65,7 @@ def make_download_list():
 		tree = html.document_fromstring(savedfile.read())
 	pics = tree.xpath("//div[contains(@class, 'saved')]")
 	for pic in pics:
-		#print(html.tostring(pic))
 		extract_info_from_div(pic)
-		print("=================\n")
 
 #get_saved_links()
 make_download_list()

@@ -11,6 +11,8 @@ imgur gallery support
 
 # Import modules
 from http import cookiejar
+from lxml import etree
+from lxml import html
 import urllib
 import getpass
 
@@ -47,8 +49,27 @@ def get_saved_links():
 	reddit_cookie = login()
 	opener = default_opener(reddit_cookie)
 	url = "https://ssl.reddit.com/user/" + username + "/saved/"
-	data2 = opener.open(url)
-	print(data2.read())
-	pass
+	data = opener.open(url)
+	saved = data.read()
+	return saved
 
-get_saved_links()
+# Receive div section for an item in etree form and extract info
+def extract_info_from_div(saved_item_div):
+	subs = saved_item_div.xpath("//a") #[contains(@class, 'subreddit')]")
+	print(html.tostring(saved_item_div))
+	print(subs)
+	for sub in subs:
+		print(html.tostring(sub))
+
+def make_download_list():
+	#saved = get_saved_links()
+	with (open("saved.html")) as savedfile:
+		tree = html.document_fromstring(savedfile.read())
+	pics = tree.xpath("//div[contains(@class, 'saved')]")
+	for pic in pics:
+		#print(html.tostring(pic))
+		extract_info_from_div(pic)
+		print("=================\n")
+
+#get_saved_links()
+make_download_list()

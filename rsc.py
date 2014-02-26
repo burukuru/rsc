@@ -15,6 +15,7 @@ from lxml import etree
 from lxml import html
 import urllib
 import getpass
+import json 
 
 # Load credentials from file
 def get_userpass():
@@ -54,16 +55,28 @@ def get_saved_links():
 	saved = data.read()
 	return saved
 
+def modhash():
+	with (open("saved.html")) as savedfile:
+		tree = html.document_fromstring(savedfile.read())
+		config = tree.xpath("//script[contains(@id, 'config')]")[0].text
+	c = json.loads(config.replace("r.setup(", "")[:-1])
+	return c['modhash']
+
 # Receive div section for an item in etree form and extract info
 def extract_info_from_div(saved_item_div):
 	sub = saved_item_div.xpath(".//a[contains(@class, 'subreddit')]")
 	link = saved_item_div.xpath(".//a[contains(@class, 'title')]")
+	print(html.tostring(saved_item_div))
 	print(sub[0].text)
 	print(link[0].attrib['href'])
 	print(saved_item_div.attrib['data-fullname'])
 
-def delete_item(item_id):
+def unsave_item(item_id):
 	print(item_id)
+	opener = default_opener(cj)
+	params = urllib.parse.urlencode({'executed': 'delete+from+saved', 'id': item_id, 'uh': modhash})
+	params_bin = params.encode('ascii')
+	data = opener.open("http://www.reddit.com/api/unsave", params_bin)
 
 def make_download_list():
 	saved = get_saved_links()
@@ -74,4 +87,7 @@ def make_download_list():
 	for pic in pics:
 		extract_info_from_div(pic)
 
-make_download_list()
+#make_download_list()
+cj = login()
+modhash = modhash()
+unsave_item("")
